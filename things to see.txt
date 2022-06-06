@@ -1,0 +1,6 @@
+naive receiver:  borrower.functionCallWithValue(
+            abi.encodeWithSignature("receiveEther(uint256)", FIXED_FEE),
+            borrowAmount
+        );
+
+trust:  target.functionCall(data);
