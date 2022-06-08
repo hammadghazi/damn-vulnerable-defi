@@ -39,9 +39,9 @@ contract FlashloanReceiver {
         address attacker
     ) external {
         // Setting values in state variable
-        flashloanerPool = IFlashloanerPool(_flashloanerPool);
-        rewardPool = IRewardPool(_rewardPool);
-        dvtTokens = IERC20(_dvtTokens);
+        flashloanerPool = _flashloanerPool;
+        rewardPool = _rewardPool;
+        dvtTokens = _dvtTokens;
 
         // Asking for loan
         flashloanerPool.flashLoan(FLASH_LOAN_AMOUNT);
