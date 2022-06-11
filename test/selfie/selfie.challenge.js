@@ -43,6 +43,8 @@ describe("[Challenge] Selfie", function () {
   it("Exploit", async function () {
     /** CODE YOUR EXPLOIT HERE */
 
+    // DETAILED EXPLANATION OF THE SOLUTION IS IN 'SelfieDrainFunds' smart contract
+
     // Deploying attacker contract
     const DrainFundsFactory = await ethers.getContractFactory(
       "SelfieDrainFunds"
