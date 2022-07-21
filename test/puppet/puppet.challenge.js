@@ -150,7 +150,7 @@ describe("[Challenge] Puppet", function () {
       .approve(this.uniswapExchange.address, ATTACKER_INITIAL_TOKEN_BALANCE);
 
     // Swapping all tokens for ETH
-    // This TX will make the price of token crash
+    // After this txn, the price of token will crash
     await this.uniswapExchange
       .connect(attacker)
       .tokenToEthSwapOutput(
