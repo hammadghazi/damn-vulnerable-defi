@@ -24,9 +24,9 @@ contract ClimberTimelock is AccessControl {
 
     // Operation data tracked in this contract
     struct Operation {
-        uint64 readyAtTimestamp;   // timestamp at which the operation will be ready for execution
-        bool known;         // whether the operation is registered in the timelock
-        bool executed;      // whether the operation has been executed
+        uint64 readyAtTimestamp; // timestamp at which the operation will be ready for execution
+        bool known; // whether the operation is registered in the timelock
+        bool executed; // whether the operation has been executed
     }
 
     // Operations are tracked by their bytes32 identifier
@@ -34,10 +34,7 @@ contract ClimberTimelock is AccessControl {
 
     uint64 public delay = 1 hours;
 
-    constructor(
-        address admin,
-        address proposer
-    ) {
+    constructor(address admin, address proposer) {
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setRoleAdmin(PROPOSER_ROLE, ADMIN_ROLE);
 
@@ -48,14 +45,18 @@ contract ClimberTimelock is AccessControl {
         _setupRole(PROPOSER_ROLE, proposer);
     }
 
-    function getOperationState(bytes32 id) public view returns (OperationState) {
+    function getOperationState(bytes32 id)
+        public
+        view
+        returns (OperationState)
+    {
         Operation memory op = operations[id];
-        
-        if(op.executed) {
+
+        if (op.executed) {
             return OperationState.Executed;
-        } else if(op.readyAtTimestamp >= block.timestamp) {
+        } else if (op.readyAtTimestamp >= block.timestamp) {
             return OperationState.ReadyForExecution;
-        } else if(op.readyAtTimestamp > 0) {
+        } else if (op.readyAtTimestamp > 0) {
             return OperationState.Scheduled;
         } else {
             return OperationState.Unknown;
@@ -77,15 +78,23 @@ contract ClimberTimelock is AccessControl {
         bytes[] calldata dataElements,
         bytes32 salt
     ) external onlyRole(PROPOSER_ROLE) {
+        console.log("sup bitch");
+
         require(targets.length > 0 && targets.length < 256);
         require(targets.length == values.length);
         require(targets.length == dataElements.length);
 
         bytes32 id = getOperationId(targets, values, dataElements, salt);
-        require(getOperationState(id) == OperationState.Unknown, "Operation already known");
-        
+        require(
+            getOperationState(id) == OperationState.Unknown,
+            "Operation already known"
+        );
+
         operations[id].readyAtTimestamp = uint64(block.timestamp) + delay;
+        console.log(block.timestamp);
+        console.log(operations[id].readyAtTimestamp);
         operations[id].known = true;
+        console.logBytes32(id);
     }
 
     /** Anyone can execute what has been scheduled via `schedule` */
@@ -100,12 +109,18 @@ contract ClimberTimelock is AccessControl {
         require(targets.length == dataElements.length);
 
         bytes32 id = getOperationId(targets, values, dataElements, salt);
-
+        console.logBytes32(id);
+        console.log("Execute sender", msg.sender);
         for (uint8 i = 0; i < targets.length; i++) {
             targets[i].functionCallWithValue(dataElements[i], values[i]);
         }
-        
-        require(getOperationState(id) == OperationState.ReadyForExecution);
+
+        console.log(">>");
+        console.log(getOperationState(id) == OperationState.Scheduled);
+        require(
+            getOperationState(id) == OperationState.ReadyForExecution,
+            "Na kr"
+        );
         operations[id].executed = true;
     }
 
